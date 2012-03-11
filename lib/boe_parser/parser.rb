@@ -1,6 +1,5 @@
 require 'open-uri'
 require 'hpricot'
-require 'date'
 
 module BoeParser
 
@@ -15,12 +14,17 @@ module BoeParser
 
     def self.fetch(date)
       # fetch BOE for date
+      begin
       date_string = date.strftime("%Y/%m/%d")
       url = "#{BASE_URL}#{date_string}"
       open(url).read
+      rescue OpenURI::HTTPError
+        nil
+      end
     end
 
     def self.parse(doc)
+      return nil if doc.nil?
       # parse html into a array of hashes
       entries = []
       boe = Hpricot(doc)
