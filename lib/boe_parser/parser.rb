@@ -15,11 +15,15 @@ module BoeParser
     def self.fetch(date)
       # fetch BOE for date
       begin
-      date_string = date.strftime("%Y/%m/%d")
-      url = "#{BASE_URL}#{date_string}"
-      open(url).read
-      rescue OpenURI::HTTPError
-        nil
+        date_string = date.strftime("%Y/%m/%d")
+        url = "#{BASE_URL}#{date_string}"
+        open(url).read
+      rescue OpenURI::HTTPError => e
+        if e.message =~ /404/
+          return nil
+        else
+          raise
+        end
       end
     end
 
@@ -58,14 +62,14 @@ module BoeParser
             texto = d.inner_html.strip
 
             entries << {
-                        :boe_num => numero,
-                        :summary => texto,
-                        :link => enlace,
-                        :reference => disposicion,
-                        :level1_section => @seccion_nivel1,
-                        :level2_section => @seccion_nivel2,
-                        :level3_section => @seccion_nivel3
-                       }
+                    :boe_num => numero,
+                    :summary => texto,
+                    :link => enlace,
+                    :reference => disposicion,
+                    :level1_section => @seccion_nivel1,
+                    :level2_section => @seccion_nivel2,
+                    :level3_section => @seccion_nivel3
+            }
 
           end
         end
